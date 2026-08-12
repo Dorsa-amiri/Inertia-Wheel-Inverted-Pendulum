@@ -1,2 +1,2 @@
-# Moving-Robotic-Arm
+# Inertia-Wheel-Inverted-Pendulum
 ...
