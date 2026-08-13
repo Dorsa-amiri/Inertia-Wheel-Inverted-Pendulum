@@ -27,16 +27,19 @@ This project builds on the mechanical structure and 3D-printed geometry of [asku
 ### Component List, Rationale & Datasheets
 
 #### Microcontroller: STM32F411CEU6 ("Black Pill" board, WeAct Studio)
-
 The microcontroller is the central processing unit of the system: it reads sensor data, executes the control algorithm, and commands the motor driver.
-
 - Core: ARM Cortex-M4 with hardware FPU, up to 100 MHz
 - Memory: 512 KB Flash, 128 KB RAM
 - Hardware timers with quadrature encoder decoding mode, PWM output, and I²C peripheral, everything the control loop needs
 - Datasheet: [STM32F411xC/E, STMicroelectronics](https://www.st.com/resource/en/datasheet/stm32f411ce.pdf)
 - Product page: [st.com](https://www.st.com/en/microcontrollers-microprocessors/stm32f411ce.html)
+- Board reference: [WeAct Black Pill V2.0, STM32-base project](https://stm32-base.org/boards/STM32F411CEU6-WeAct-Black-Pill-V2.0.html)
 
 We replaced the original project's official Nucleo-F411RE board with a much cheaper "Black Pill" development board built around the same MCU. It exposes the same core peripherals needed for this project. The one practical difference is that the Black Pill has no onboard ST-Link debug probe; firmware is instead flashed through the chip's built-in USB DFU bootloader over the onboard USB Type-C port, using STM32CubeProgrammer instead of a one-click Keil download. Live SWD debugging (breakpoints) is not available this way; an external ST-Link can be added later if needed.
+
+> Note: the Black Pill's 25 MHz crystal cannot be divided to the precise 48 MHz required by the USB peripheral while the core runs at its rated maximum of 100 MHz; with USB (and therefore the DFU bootloader) enabled, the achievable core clock is capped at 96 MHz. This project runs at 96 MHz for that reason.
+
+> Caution: on this board, the +5V header pins are wired directly to the USB connector's VBUS with no protection diode. Do not power the board from an external supply and USB at the same time.
 
 #### Motor Driver: BTS7960 (43 A dual half-bridge module)
 
