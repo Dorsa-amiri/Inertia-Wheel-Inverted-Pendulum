@@ -57,6 +57,12 @@ The original project used a Monster Moto Shield (VNH2SP30-based), an Arduino-shi
 
 The original repository used a salvaged Mabuchi RS-385PH pulled from office equipment (printers/copiers), which came with a factory-fitted encoder; these units are essentially unobtainable today. We sourced a new (not salvaged) Mabuchi RS-385 motor without the factory encoder, and paired it with a separately purchased AS5600 sensor for speed feedback (see below).
 
+- Voltage: 12 V
+- Shaft diameter: 2.3 mm, dual-shaft, gearless
+- Codes printed on the motor housing: `6007-350-0018`, `385-17150-01`, `1H7G`
+
+No public datasheet could be located for this exact part number; the codes above appear to be an internal packager/distributor part number rather than a standard Mabuchi catalog designation, so the figures listed here are limited to what is printed on the unit itself. For general reference on this motor family's typical electrical characteristics, see the [Mabuchi RS-385PH datasheet](https://datasheet.octopart.com/RS385PH-10280-Mabuchi-datasheet-13546593.pdf). Note that this is a different, encoder-equipped variant, so its figures should not be taken as exact for our unit.
+
 #### Motor Speed Sensor: AS5600 magnetic rotary position sensor
 
 - Datasheet: [AS5600, ams AG](https://files.seeedstudio.com/wiki/Grove-12-bit-Magnetic-Rotary-Position-Sensor-AS5600/res/Magnetic%20Rotary%20Position%20Sensor%20AS5600%20Datasheet.pdf)
