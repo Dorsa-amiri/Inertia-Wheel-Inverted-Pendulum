@@ -49,13 +49,13 @@ We replaced the original project's official Nucleo-F411RE board with a much chea
 
 The original project used a Monster Moto Shield (VNH2SP30-based), an Arduino-shield-form-factor product that is largely discontinued and hard to source today. BTS7960 modules are a widely available, inexpensive, well-documented alternative that comfortably exceeds this project's current requirements, giving a generous safety margin over the motor's actual draw.
 
-#### Motor: RS-385, 12 V, dual-shaft, gearless
+#### Motor: Mabuchi RS-385, 12 V, dual-shaft, gearless
 
-"RS-385" is a standard small DC motor frame size produced by multiple manufacturers, not a single proprietary part. We specifically required:
+"RS-385" is a standard small DC motor frame size, produced by Mabuchi (among other manufacturers) in several variants. We specifically required:
 - Dual shaft, because the design uses both ends: the front shaft drives the inertia wheel, the rear (free) shaft carries the speed-feedback sensor
 - No gearbox, because gear backlash introduces nonlinear, hard-to-model behavior that is undesirable for precise control, and because the reduced output speed of a gearmotor is unsuitable for a reaction wheel that needs to spin up and down quickly
 
-The original repository used a salvaged Mabuchi RS-385PH pulled from office equipment (printers/copiers); these are essentially unobtainable today. A generic RS-385-class motor with the same frame size is a practical, available substitute.
+The original repository used a salvaged Mabuchi RS-385PH pulled from office equipment (printers/copiers), which came with a factory-fitted encoder; these units are essentially unobtainable today. We sourced a new (not salvaged) Mabuchi RS-385 motor without the factory encoder, and paired it with a separately purchased AS5600 sensor for speed feedback (see below).
 
 #### Motor Speed Sensor: AS5600 magnetic rotary position sensor
 
