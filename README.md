@@ -1,2 +1,145 @@
-# Inertia-Wheel-Inverted-Pendulum
-...
+# Inertia Wheel Inverted Pendulum
+
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Hardware](#hardware)
+  - [Component List, Rationale & Datasheets](#component-list-rationale--datasheets)
+  - [Where We Bought Everything](#where-we-bought-everything)
+  - [3D Printing](#3d-printing)
+  - [Assembly](#assembly)
+- [Modeling & Control Design](#modeling--control-design) — *coming soon*
+- [Software](#software) — *coming soon*
+- [Roadmap / Future Work](#roadmap--future-work)
+- [Acknowledgements](#acknowledgements)
+
+---
+
+## Project Overview
+
+> *(Placeholder — one or two paragraphs describing what an inertia-wheel inverted pendulum is, what it's for, and a short summary of the system, to be filled in.)*
+
+---
+
+## Hardware
+
+This project is a component-level update of [askuric/inverted_inertia_pendulum](https://github.com/askuric/inverted_inertia_pendulum). We kept the mechanical design and all 3D-printed geometry from the original repository unchanged. However, several years have passed since the original project was published, and a number of the originally suggested electronic components (in particular the salvaged Mabuchi RS-385PH motor with factory-fitted encoder, and the Monster Moto Shield driver) are no longer realistically available to us. Where an update was possible without altering the printed geometry, we selected a modern, available replacement. This section documents every component we used, why we chose it, and where to find more information or buy it. Photos of the physical parts we bought are collected in [`/images/hardware/`](./images/hardware/); a condensed purchase list with links and prices is kept in [`/docs/BOM.md`](./docs/BOM.md).
+
+### Component List, Rationale & Datasheets
+
+#### Microcontroller — STM32F411CEU6 ("Black Pill" board, WeAct Studio)
+
+The microcontroller is the central processing unit of the system: it reads sensor data, executes the control algorithm, and commands the motor driver.
+
+- **Core:** ARM Cortex-M4 with hardware FPU, up to 100 MHz
+- **Memory:** 512 KB Flash, 128 KB RAM
+- Hardware timers with quadrature encoder decoding mode, PWM output, and I²C peripheral — everything the control loop needs
+- **Datasheet:** [STM32F411xC/E — STMicroelectronics](https://www.st.com/resource/en/datasheet/stm32f411ce.pdf)
+- **Product page:** [st.com](https://www.st.com/en/microcontrollers-microprocessors/stm32f411ce.html)
+
+We replaced the original project's official Nucleo-F411RE board with a much cheaper "Black Pill" development board built around the same MCU. It exposes the same core peripherals needed for this project. The one practical difference is that the Black Pill has no onboard ST-Link debug probe; firmware is instead flashed through the chip's built-in USB DFU bootloader over the onboard USB Type-C port, using STM32CubeProgrammer instead of a one-click Keil download. Live SWD debugging (breakpoints) is not available this way — an external ST-Link can be added later if needed.
+
+#### Motor Driver — BTS7960 (43 A dual half-bridge module)
+
+- **Datasheet:** [BTS7960 — Infineon Technologies](https://www.infineon.com/assets/row/public/documents/10/57/infineon-bts7960-ds-en.pdf)
+- Supply voltage range: 5.5–27.5 V, up to 43 A continuous
+- Built-in protection: overcurrent, overtemperature, short-circuit, undervoltage lockout
+
+The original project used a Monster Moto Shield (VNH2SP30-based), an Arduino-shield-form-factor product that is largely discontinued and hard to source today. BTS7960 modules are a widely available, inexpensive, well-documented alternative that comfortably exceeds this project's current requirements, giving a generous safety margin over the motor's actual draw.
+
+#### Motor — RS-385, 12 V, dual-shaft, gearless
+
+"RS-385" is a standard small DC motor frame size produced by multiple manufacturers, not a single proprietary part. We specifically required:
+- **Dual shaft**, because the design uses both ends: the front shaft drives the inertia wheel, the rear (free) shaft carries the speed-feedback sensor
+- **No gearbox**, because gear backlash introduces nonlinear, hard-to-model behavior that is undesirable for precise control, and because the reduced output speed of a gearmotor is unsuitable for a reaction wheel that needs to spin up/down quickly
+
+The original repository used a salvaged Mabuchi RS-385PH pulled from office equipment (printers/copiers) — these are essentially unobtanium today. A generic RS-385-class motor with the same frame size is a practical, available substitute.
+
+#### Motor Speed Sensor — AS5600 magnetic rotary position sensor
+
+- **Datasheet:** [AS5600 — ams AG](https://files.seeedstudio.com/wiki/Grove-12-bit-Magnetic-Rotary-Position-Sensor-AS5600/res/Magnetic%20Rotary%20Position%20Sensor%20AS5600%20Datasheet.pdf)
+- **Product page:** [ams-osram.com](https://ams-osram.com/products/sensor-solutions/position-sensors/ams-as5600-position-sensor)
+- 12-bit resolution (4096 counts/revolution), contactless Hall-effect sensing, I²C output
+
+The original project measured motor speed with a hand-built sensor: two discrete digital Hall sensors plus a small multi-pole magnetic disc salvaged from a Pololu Romi encoder kit, requiring careful manual alignment. We replaced this with a single AS5600 module (magnet included), mounted opposite a small magnet glued to the motor's rear shaft. This is mechanically much simpler to install and gives substantially higher resolution than the original 12–20 CPR approach.
+
+Because a generic gearless RS-385 motor does not have the small internal-spline gear that the original inertia wheel STL's hub is shaped for, we designed and 3D-printed a small custom coupler that mates the wheel's original 12-tooth internal spline (measured directly from the STL geometry) to a plain round motor shaft. See [`/CAD/STL/motor_shaft_to_wheel_adapter_12T.stl`](./CAD/STL/motor_shaft_to_wheel_adapter_12T.stl).
+
+#### Pendulum Angle Sensor — Two-phase optical rotary encoder, 600 CPR (HN3806 / LPD3806 family)
+
+This sensor is the primary feedback signal of the whole system — it measures the pendulum arm's angle relative to vertical, the variable the controller is trying to stabilize.
+
+Body diameter and 6 mm shaft match the original project's `encoder_holder.STL` and `axel_adapter_10mm_encoder.STL` print files directly, so no redesign was needed here.
+
+We initially tried a precision potentiometer instead. In practice, because only a small angular range of the pendulum's swing is actually used, only a small portion of the potentiometer's resistive track is exercised, which made the signal noise-sensitive — this was especially pronounced with the low-cost unit we had (higher-precision German-made potentiometers reportedly avoid this issue, but were significantly more expensive than we could justify). We moved to a digital two-phase (quadrature) optical encoder instead, which is inherently more noise-resistant and additionally reports direction of rotation, which a simple potentiometer does not.
+
+> **Note:** Pull-up resistors (1–10 kΩ) are required on both phase lines to VCC — without them the encoder output is unusable and can potentially damage the sensor's output stage.
+
+#### Power Supply — 18 V, 3 A switching adapter
+
+Feeds the motor side of the BTS7960 driver only (logic-side components run off the MCU board's own 5 V/3.3 V rails). Since the motor's rated voltage (12 V) is lower than the supply, the maximum PWM duty cycle is capped in firmware (~65–70%) so the motor's effective voltage never exceeds its rating. 3 A gives comfortable headroom over this small motor's actual draw.
+
+#### Mechanical Hardware
+
+| Part | Spec |
+|---|---|
+| Pendulum arm rod | Brass, ⌀6 mm × 120 mm |
+| Pivot bolt + nuts | M10×1.5 bolt (1×), M10×1.5 nuts (2×) |
+| Fasteners | M3 socket-head screws, assorted lengths (8–16 mm) |
+| Heat-set threaded inserts | Brass, M3 |
+| Pivot bearings | 6300-series ball bearings (10 × 35 × 11 mm), 2× |
+| Base plate | ~90 × 300 mm sheet, 2 mm thick |
+
+These were kept as specified in the original project, since they are standard, widely available parts.
+
+### Where We Bought Everything
+
+Most components were purchased in person rather than online, because no single supplier reliably stocked more than one or two of the parts at a time — each component was typically found at a different store. The only component ordered online was the power adapter: *(insert link here)*.
+
+> **Components that were genuinely hard to find:** the Monster Moto Shield (discontinued — replaced with BTS7960), a factory-encoder-equipped RS-385PH motor (essentially unobtainable — replaced with a bare motor + AS5600), and consistent stock of the pendulum's optical rotary encoder across suppliers.
+
+### 3D Printing
+
+All parts were printed in **PLA**. Printer used: *(insert printer/slicer details)*. Minimum layer height available to us was 0.2 mm; the original repository recommends 0.1 mm specifically for the inertia wheel for best surface finish, which we adjusted for accordingly (see notes below).
+
+All files below live under [`/CAD/STL/`](./CAD/STL/). Slicer screenshots documenting these settings are in [`/images/printing/`](./images/printing/).
+
+| # | File | Layer height | Infill |
+|---|---|---|---|
+| 1 | `mabuchi_wheel_12T.STL` | 0.2 mm | 50%+ |
+| 2 | `motor_mout_mabuchi.STL` | 0.2 mm | 30% |
+| 3 | `bearing_holder.STL` | 0.2 mm | 30% |
+| 4 | `mount_table_sharft_holder.STL` | 0.2 mm | 30% |
+| 5 | `table_mount.STL` | 0.2 mm | 30% |
+| 6 | `nucleo_holder.STL` | 0.2 mm | 30% |
+| 7 | `encoder_holder.STL` | 0.2 mm | 30% |
+| 8 | `axel_adapter_10mm_encoder.STL` | 0.2 mm | 100%* |
+| 9 | `motor_shaft_to_wheel_adapter_12T.stl` (custom, this repo) | 0.2 mm | 100% |
+
+Original Solidworks/STEP source files are kept in [`/CAD/source/`](./CAD/source/).
+
+\* Small parts with thin cross-sections are automatically printed fully solid by the slicer regardless of the configured infill percentage, since there is no room for a distinct infill pattern — this is expected behavior and does not indicate a problem; it only increases strength.
+
+Only the `mabuchi_wheel_12T.STL` variant is used (not the 14-tooth version), since the custom motor-shaft adapter was designed specifically to match its internal spline geometry.
+
+### Assembly
+
+*(Step-by-step assembly instructions to be written here — pivot/base assembly, pendulum arm, motor + wheel + encoder at the free end, pendulum-angle encoder at the pivot, electronics mounting, wiring. Reference photos go in [`/images/assembly/`](./images/assembly/).)*
+
+---
+
+## Modeling & Control Design
+*Coming soon — dynamic model, simulation, and initial controller gain computation (PD, LQR).*
+
+## Software
+*Coming soon — firmware, hardware validation/test routines, controller implementation.*
+
+## Roadmap / Future Work
+
+- [ ] Control the system using image processing as an alternative sensing method
+- [ ] Graphical interface with buttons to select and run a given controller
+- [ ] A dedicated test/diagnostic mode: automatically return the system to its home position before running, verify each subsystem responds correctly to known commands, and gracefully handle faults (e.g. out-of-range encoder readings, a motor spinning without responding to commands, a lost communication link) instead of producing undefined/garbage output
+- [ ] Compare simulation results against real system results for each controller, and compare all controllers against each other
+
+## Acknowledgements
+
+Based on [askuric/inverted_inertia_pendulum](https://github.com/askuric/inverted_inertia_pendulum). Mechanical design and 3D-printed geometry are used largely unmodified; electronic components were updated where the originals were no longer available.
