@@ -15,7 +15,7 @@
 ---
 
 ## Project Overview
-
+0000000
 > *(Placeholder: one or two paragraphs describing what an inertia-wheel inverted pendulum is, what it's for, and a short summary of the system, to be filled in.)*
 
 ---
