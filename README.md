@@ -9,7 +9,7 @@
   - [Assembly](#assembly)
 - [Modeling & Control Design](#modeling--control-design) (coming soon)
 - [Software](#software) (coming soon)
-- component testing
+- [component testing](#component-testing)
 - [Roadmap / Future Work](#roadmap--future-work)
 - [Acknowledgements](#acknowledgements)
 
