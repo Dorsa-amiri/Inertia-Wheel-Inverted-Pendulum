@@ -18,7 +18,9 @@
 Inertia Wheel Inverted Pendulum: System Overview & Control Scope
 
 The Inertia Wheel Inverted Pendulum is an underactuated, non-linear dynamic system designed to demonstrate the real-time stabilization of an inherently unstable process. Unlike traditional cart-pole mechanisms that achieve equilibrium through base displacement, this platform balances vertically by using reaction torque generated at its free end. Accelerating a high-inertia flywheel mounted atop the pendulum rod produces equal and opposite rotational forces that continuously counteract destabilizing gravitational torques. To support physical realization, the platform integrates a complete hardware and software framework covering computer-aided mechanical design, embedded electronics, and low-latency real-time execution.
+
 Mathematically, the platform bridges non-linear physical dynamics with state-space control theory. By linearizing the system's differential equations around the unstable upright equilibrium point, an optimal Linear Quadratic Regulator (LQR) is synthesized within MATLAB. Operating on full state feedback (continuously monitoring pendulum position, angular velocity, and flywheel speed), this real-time feedback loop establishes a baseline for stabilizing complex, underactuated hardware processes against external perturbations.
+
 Building on this baseline of classical PD and LQR control, the project also aims to explore more advanced control strategies, including Model Predictive Control (MPC), sliding mode control, and adaptive methods, time permitting. Where implemented, these controllers would be benchmarked under identical operational conditions to examine trade-offs across dynamic response, disturbance rejection, energy efficiency, and algorithmic robustness.
 
 
