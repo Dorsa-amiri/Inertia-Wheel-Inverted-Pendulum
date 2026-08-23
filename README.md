@@ -149,6 +149,9 @@ Only the `mabuchi_wheel_12T.STL` variant is used (not the 14-tooth version), sin
 ## Software
 *Coming soon: firmware, hardware validation/test routines, controller implementation.*
 
+## component testing
+* files containing codes and testing process
+* 
 ## Roadmap / Future Work
 
 - [ ] Control the system using image processing as an alternative sensing method
