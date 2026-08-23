@@ -142,7 +142,13 @@ Only the `mabuchi_wheel_12T.STL` variant is used (not the 14-tooth version), sin
 *(Step-by-step assembly instructions to be written here: pivot/base assembly, pendulum arm, motor + wheel + encoder at the free end, pendulum-angle encoder at the pivot, electronics mounting, wiring. Reference photos go in [`/images/assembly/`](./images/assembly/).)*
 
 ## component testing
-* files containing codes and testing process
+
+### STM32F411CEU6 Board Test
+
+To verify that the STM32F411CEU6 development board was functioning correctly, we performed a basic GPIO test by turning the onboard LED on and off.
+
+The test code can be found here:
+[Inertia Wheel Inverted Pendulum – GitHub](https://github.com/Dorsa-amiri/Inertia-Wheel-Inverted-Pendulum)
 ---
 
 ## Modeling & Control Design
