@@ -141,6 +141,8 @@ Only the `mabuchi_wheel_12T.STL` variant is used (not the 14-tooth version), sin
 
 *(Step-by-step assembly instructions to be written here: pivot/base assembly, pendulum arm, motor + wheel + encoder at the free end, pendulum-angle encoder at the pivot, electronics mounting, wiring. Reference photos go in [`/images/assembly/`](./images/assembly/).)*
 
+## component testing
+* files containing codes and testing process
 ---
 
 ## Modeling & Control Design
@@ -149,9 +151,6 @@ Only the `mabuchi_wheel_12T.STL` variant is used (not the 14-tooth version), sin
 ## Software
 *Coming soon: firmware, hardware validation/test routines, controller implementation.*
 
-## component testing
-* files containing codes and testing process
-* 
 ## Roadmap / Future Work
 
 - [ ] Control the system using image processing as an alternative sensing method
