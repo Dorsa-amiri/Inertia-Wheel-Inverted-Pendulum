@@ -80,19 +80,26 @@ The original project measured motor speed with a hand-built sensor: two discrete
 
 Because a generic gearless RS-385 motor does not have the small internal-spline gear that the original inertia wheel STL's hub is shaped for, we designed and 3D-printed a small custom coupler that mates the wheel's original 12-tooth internal spline (measured directly from the STL geometry) to a plain round motor shaft. See [`/CAD/STL/motor_shaft_to_wheel_adapter_12T.stl`](./CAD/STL/motor_shaft_to_wheel_adapter_12T.stl).
 
-#### Pendulum Angle Sensor: two-phase optical rotary encoder, 600 CPR (HN3806 / LPD3806 family)
-
+#### Pendulum Angle Sensor: two-phase optical rotary encoder, 600 CPR (labeled E6A2-38F600-12C-2M)
 This sensor is the primary feedback signal of the whole system: it measures the pendulum arm's angle relative to vertical, the variable the controller is trying to stabilize.
 
-Body diameter and 6 mm shaft match the original project's `encoder_holder.STL` and `axel_adapter_10mm_encoder.STL` print files directly, so no redesign was needed here.
+- Source: [Partineh](https://partineh.com/product/%d8%b1%d9%88%d8%aa%d8%a7%d8%b1%db%8c-%d8%a7%d9%86%da%a9%d9%88%d8%af%d8%b1-%d9%86%d9%88%d8%b1%db%8c-%d8%af%d9%88-%d9%81%d8%a7%d8%b2-600-%d8%af%d8%b1%d8%ac%d9%87-%d9%85%d8%af%d9%84-hn3806) (6–24 VDC, 38 mm body diameter, 6 mm shaft, 600 pulses/rev, up to 5000 RPM)
 
-We initially tried a precision potentiometer instead. In practice, because only a small angular range of the pendulum's swing is actually used, only a small portion of the potentiometer's resistive track is exercised, which made the signal noise-sensitive, especially with the low-cost unit we had (higher-precision German-made potentiometers reportedly avoid this issue, but were significantly more expensive than we could justify). We moved to a digital two-phase (quadrature) optical encoder instead, which is inherently more noise-resistant and additionally reports direction of rotation, something a simple potentiometer does not do.
+The part is stamped `E6A2-38F600-12C-2M`, styled after Omron's E6A2 series naming, but its specifications (38 mm body, 600 PPR) do not match any genuine Omron E6A2 model (which tops out at 25 mm body diameter and 500 PPR). It appears to be an unofficial part following that naming convention rather than a genuine Omron part, and no datasheet matching its actual specifications could be located; the figures above come from the seller's listing.
+
+We chose a digital two-phase (quadrature) optical encoder over a potentiometer for several reasons:
+
+- **Precision for the controller.** The higher the precision of the pendulum angle measurement, the better a controller, especially LQR, can manage the unstable equilibrium. This need for precision is what ruled out a potentiometer in the first place.
+- **Prior experience with potentiometers.** From earlier work with precision potentiometers, we knew that because the pendulum's rotation is not confined to a small range (it can exceed 360°) while the highest precision is only needed near the small angular range around vertical, a multi-turn (10-turn) potentiometer only exercises a small portion of its resistive track within that critical range. This makes the signal noise-sensitive, particularly with the Chinese-made unit we would have used; German-made precision potentiometers reportedly avoid this issue, but their price was significantly higher than we could justify (this was not a low-cost part in absolute terms, just cheaper than the German alternative).
+- **Noise immunity.** A digital two-phase output is inherently more noise-resistant than an analog potentiometer signal.
+- **Direction sensing.** The AB output (two phases, 90° apart) reports rotation direction in addition to magnitude, something a simple potentiometer does not provide by default.
+- **Effective resolution above the nominal rating.** Counting both rising and falling edges on both phases yields up to 4x the nominal resolution, so even a 360 CPR version would effectively give around 1440 counts/revolution. This is why lower-CPR options were also viable candidates. We chose the 600 CPR version as the best, most precise option available (2400 effective counts/revolution versus 1440 for the 360 CPR version).
+- **Physical compatibility.** The body diameter and shaft size of this encoder (38 mm body, 6 mm shaft) match the original project's `encoder_holder.STL` and `axel_adapter_10mm_encoder.STL` print files directly, requiring no redesign.
 
 > Note: Pull-up resistors (1 to 10 kΩ) are required on both phase lines to VCC. Without them the encoder output is unusable and can potentially damage the sensor's output stage.
 
-#### Power Supply: 18 V, 3 A switching adapter
-
-Feeds the motor side of the BTS7960 driver only (logic-side components run off the MCU board's own 5 V/3.3 V rails). Since the motor's rated voltage (12 V) is lower than the supply, the maximum PWM duty cycle is capped in firmware (around 65 to 70%) so the motor's effective voltage never exceeds its rating. 3 A gives comfortable headroom over this small motor's actual draw.
+#### Power Supply: 18 V, 3 A switching adapter (Lexus IR-54)
+Feeds the motor side of the BTS7960 driver only (logic-side components run off the MCU board's own 5 V/3.3 V rails). Input: AC 100–240 V, 50/60 Hz; output: 18 V, 3 A. Since the motor's rated voltage (12 V) is lower than the supply, the maximum PWM duty cycle is capped in firmware (around 65 to 70%) so the motor's effective voltage never exceeds its rating. 3 A gives comfortable headroom over this small motor's actual draw.
 
 #### Mechanical Hardware
 
