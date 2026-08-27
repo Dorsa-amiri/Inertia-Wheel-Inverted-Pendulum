@@ -9,7 +9,7 @@
   - [Assembly](#assembly)
 - [Modeling & Control Design](#modeling--control-design) (coming soon)
 - [Software](#software) (coming soon)
-- [component testing](#component-testing)
+- [Component Testing](#component-testing)
 - [Roadmap / Future Work](#roadmap--future-work)
 - [Acknowledgements](#acknowledgements)
 
@@ -89,12 +89,12 @@ The part is stamped `E6A2-38F600-12C-2M`, styled after Omron's E6A2 series namin
 
 We chose a digital two-phase (quadrature) optical encoder over a potentiometer for several reasons:
 
-- **Precision for the controller.** The higher the precision of the pendulum angle measurement, the better a controller, especially LQR, can manage the unstable equilibrium. This need for precision is what ruled out a potentiometer in the first place.
-- **Prior experience with potentiometers.** From earlier work with precision potentiometers, we knew that because the pendulum's rotation is not confined to a small range (it can exceed 360°) while the highest precision is only needed near the small angular range around vertical, a multi-turn (10-turn) potentiometer only exercises a small portion of its resistive track within that critical range. This makes the signal noise-sensitive, particularly with the Chinese-made unit we would have used; German-made precision potentiometers reportedly avoid this issue, but their price was significantly higher than we could justify (this was not a low-cost part in absolute terms, just cheaper than the German alternative).
-- **Noise immunity.** A digital two-phase output is inherently more noise-resistant than an analog potentiometer signal.
-- **Direction sensing.** The AB output (two phases, 90° apart) reports rotation direction in addition to magnitude, something a simple potentiometer does not provide by default.
-- **Effective resolution above the nominal rating.** Counting both rising and falling edges on both phases yields up to 4x the nominal resolution, so even a 360 CPR version would effectively give around 1440 counts/revolution. This is why lower-CPR options were also viable candidates. We chose the 600 CPR version as the best, most precise option available (2400 effective counts/revolution versus 1440 for the 360 CPR version).
-- **Physical compatibility.** The body diameter and shaft size of this encoder (38 mm body, 6 mm shaft) match the original project's `encoder_holder.STL` and `axel_adapter_10mm_encoder.STL` print files directly, requiring no redesign.
+- Precision for the controller. The higher the precision of the pendulum angle measurement, the better a controller, especially LQR, can manage the unstable equilibrium. This need for precision is what ruled out a potentiometer in the first place.
+- Prior experience with potentiometers. From earlier work with precision potentiometers, we knew that because the pendulum's rotation is not confined to a small range (it can exceed 360°) while the highest precision is only needed near the small angular range around vertical, a multi-turn (10-turn) potentiometer only exercises a small portion of its resistive track within that critical range. This makes the signal noise-sensitive, particularly with the Chinese-made unit we would have used; German-made precision potentiometers reportedly avoid this issue, but their price was significantly higher than we could justify (this was not a low-cost part in absolute terms, just cheaper than the German alternative).
+- Noise immunity. A digital two-phase output is inherently more noise-resistant than an analog potentiometer signal.
+- Direction sensing. The AB output (two phases, 90° apart) reports rotation direction in addition to magnitude, something a simple potentiometer does not provide by default.
+- Effective resolution above the nominal rating. Counting both rising and falling edges on both phases yields up to 4x the nominal resolution, so even a 360 CPR version would effectively give around 1440 counts/revolution. This is why lower-CPR options were also viable candidates. We chose the 600 CPR version as the best, most precise option available (2400 effective counts/revolution versus 1440 for the 360 CPR version).
+- Physical compatibility. The body diameter and shaft size of this encoder (38 mm body, 6 mm shaft) match the original project's `encoder_holder.STL` and `axel_adapter_10mm_encoder.STL` print files directly, requiring no redesign.
 
 > Note: Pull-up resistors (1 to 10 kΩ) are required on both phase lines to VCC. Without them the encoder output is unusable and can potentially damage the sensor's output stage.
 
@@ -105,7 +105,7 @@ Feeds the motor side of the BTS7960 driver only (logic-side components run off t
 
 | Part | Spec |
 |---|---|
-| Pendulum arm rod | Brass, ⌀6 mm × 120 mm |
+| Pendulum arm rod | Aluminum, solid, ⌀6 mm × 120 mm (repurposed from a crochet hook) |
 | Pivot bolt + nuts | M10×1.5 bolt (1×), M10×1.5 nuts (2×) |
 | Fasteners | M3 socket-head screws, assorted lengths (8 to 16 mm) |
 | Heat-set threaded inserts | Brass, M3 |
@@ -116,7 +116,7 @@ These were kept as specified in the original project, since they are standard, w
 
 ### Where We Bought Everything
 
-Most components were purchased in person rather than online, because no single supplier reliably stocked more than one or two of the parts at a time; each component was typically found at a different store. The only component ordered online was the power adapter: *(insert link here)*.
+Most components were purchased in person rather than online, because no single supplier reliably stocked more than one or two of the parts at a time; each component was typically found at a different store. Two components were ordered online instead: the pendulum-angle encoder ([partineh.com](https://partineh.com/product/%d8%b1%d9%88%d8%aa%d8%a7%d8%b1%db%8c-%d8%a7%d9%86%da%a9%d9%88%d8%af%d8%b1-%d9%86%d9%88%d8%b1%db%8c-%d8%af%d9%88-%d9%81%d8%a7%d8%b2-600-%d8%af%d8%b1%d8%ac%d9%87-%d9%85%d8%af%d9%84-hn3806)) and the pivot bearings ([fidarbearing.ir](http://fidarbearing.ir)). Supplier websites for the remaining, in-person-purchased parts are still listed in [`/docs/BOM.md`](./docs/BOM.md) for reference and stock-checking.
 
 Components that were genuinely hard to find: the Monster Moto Shield (discontinued, replaced with BTS7960), a factory-encoder-equipped RS-385PH motor (essentially unobtainable, replaced with a bare motor plus AS5600), and consistent stock of the pendulum's optical rotary encoder across suppliers.
 
@@ -148,7 +148,9 @@ Only the `mabuchi_wheel_12T.STL` variant is used (not the 14-tooth version), sin
 
 *(Step-by-step assembly instructions to be written here: pivot/base assembly, pendulum arm, motor + wheel + encoder at the free end, pendulum-angle encoder at the pivot, electronics mounting, wiring. Reference photos go in [`/images/assembly/`](./images/assembly/).)*
 
-## component testing
+---
+
+## Component Testing
 
 1-STM32F411CEU6 Board Test
 
