@@ -106,7 +106,7 @@ Feeds the motor side of the BTS7960 driver only (logic-side components run off t
 | Part | Spec |
 |---|---|
 | Pendulum arm rod | Aluminum, solid, ⌀6 mm × 120 mm (repurposed from a crochet hook) |
-| Pivot bolt + nuts | M10×1.5 bolt (1×), M10×1.5 nuts (2×) |
+| Pivot bolt + nuts | M10×1.5 bolt (1×), M10×1.5 nuts (3×) |
 | Fasteners | M3 socket-head screws, assorted lengths (8 to 16 mm) |
 | Heat-set threaded inserts | Brass, M3 |
 | Pivot bearings | 6300-series ball bearings (10 × 35 × 11 mm), 2× |
