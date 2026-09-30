@@ -110,7 +110,7 @@ Feeds the motor side of the BTS7960 driver only (logic-side components run off t
 | Fasteners | M3 socket-head screws, assorted lengths (8 to 16 mm) |
 | Heat-set threaded inserts | Brass, M3 |
 | Pivot bearings | 6300-series ball bearings (10 × 35 × 11 mm), 2× |
-| Base plate | ~90 × 300 mm sheet, 2 mm thick |
+| Base plate | Wooden board, 20 × 140 × 300 mm |
 
 These were kept as specified in the original project, since they are standard, widely available parts.
 
